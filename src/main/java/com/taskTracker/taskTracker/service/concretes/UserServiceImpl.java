@@ -6,12 +6,15 @@ import com.taskTracker.taskTracker.service.abstracts.UserService;
 import com.taskTracker.taskTracker.service.dtos.requests.user.CreateUserRequest;
 import com.taskTracker.taskTracker.service.dtos.requests.user.UpdateUserRequest;
 import com.taskTracker.taskTracker.service.dtos.responses.user.CreatedUserResponse;
+import com.taskTracker.taskTracker.service.dtos.responses.user.DeletedUserResponse;
 import com.taskTracker.taskTracker.service.dtos.responses.user.GetListUserResponse;
 import com.taskTracker.taskTracker.service.dtos.responses.user.UpdateUserResponse;
 import com.taskTracker.taskTracker.service.mappers.UserMapper;
+import com.taskTracker.taskTracker.service.rules.UserBusinessRules;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserBusinessRules rules;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserBusinessRules rules) {
         this.userRepository = userRepository;
+        this.rules= rules;
     }
     @Override
     public CreatedUserResponse add(CreateUserRequest request) {
+      rules.checkIfEmailExists(request.email());
+
       User user = UserMapper.INSTANCE.toEntity(request);
       User savedUser = userRepository.save(user);
       CreatedUserResponse response = UserMapper.INSTANCE.toResponse(savedUser);
@@ -42,13 +49,14 @@ public class UserServiceImpl implements UserService {
     };
     @Override
     public void deleteById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("No user found by: ID " + id);
-        }
+        rules.checkIfIdExists(id);
+
         userRepository.deleteById(id);
     }
     @Override
     public List<GetListUserResponse> findById(Long id){
+        rules.checkIfIdExists(id);
+
         Optional<User> users = userRepository.findById(id);
         List<GetListUserResponse> responses = new ArrayList<>();
 
@@ -71,6 +79,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUserResponse update(UpdateUserRequest updateUserRequest){
+        rules.checkIfIdExists(updateUserRequest.id());
+        rules.checkIfEmailAlreadyUsedByAnotherUser(updateUserRequest.email(),updateUserRequest.id());
         User user = userRepository.findById(updateUserRequest.id())
                 .orElseThrow(()->new RuntimeException("User not found"));
         user.setUserName(updateUserRequest.userName());
@@ -82,11 +92,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<GetListUserResponse> findByEmail(String email){
-        List<User> users = userRepository.findByEmail(email);
-        List<GetListUserResponse> responses = users.stream().
-                map(UserMapper.INSTANCE::toGetListResponse).
-                collect(Collectors.toList());
-        return responses;
+    public GetListUserResponse findByEmail(String email){
+        User user  = userRepository.findByEmail(email);
+        GetListUserResponse response = UserMapper.INSTANCE.toGetListResponse(user);
+        return response;
+    }
+    @Override
+    public DeletedUserResponse softDelete(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new EntityNotFoundException("User not found"));
+        user.setDeletedAt(LocalDateTime.now());
+        User deletedUser = userRepository.save(user);
+        DeletedUserResponse response = UserMapper.INSTANCE.deletedUserResponse(deletedUser);
+        return response;
+
+
     }
 }

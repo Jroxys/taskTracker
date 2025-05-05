@@ -3,6 +3,7 @@ package com.taskTracker.taskTracker.service.mappers;
 import com.taskTracker.taskTracker.entity.User;
 import com.taskTracker.taskTracker.service.dtos.requests.user.CreateUserRequest;
 import com.taskTracker.taskTracker.service.dtos.responses.user.CreatedUserResponse;
+import com.taskTracker.taskTracker.service.dtos.responses.user.DeletedUserResponse;
 import com.taskTracker.taskTracker.service.dtos.responses.user.GetListUserResponse;
 import com.taskTracker.taskTracker.service.dtos.responses.user.UpdateUserResponse;
 import org.mapstruct.Mapper;
@@ -18,4 +19,5 @@ public interface UserMapper {
     User toEntity(CreateUserRequest request);
     CreatedUserResponse toResponse(User user);
     GetListUserResponse toGetListResponse(User user);
+    DeletedUserResponse deletedUserResponse(User user);
 }

@@ -49,7 +49,7 @@ public class UserController {
     }
     @GetMapping("/email/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetListUserResponse> findByEmail(@PathVariable String email){
+    public GetListUserResponse findByEmail(@PathVariable String email){
         return userService.findByEmail(email);
     }
 

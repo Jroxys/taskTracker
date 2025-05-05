@@ -10,5 +10,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findByUserName(String userName);
     void deleteById(Long id);
-    List<User> findByEmail(String email);
+    User findByEmail(String email);
+    User softDelete(User user);
 }

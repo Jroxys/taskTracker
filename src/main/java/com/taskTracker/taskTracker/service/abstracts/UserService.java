@@ -1,4 +1,5 @@
 package com.taskTracker.taskTracker.service.abstracts;
+import com.taskTracker.taskTracker.entity.User;
 import com.taskTracker.taskTracker.service.dtos.requests.user.CreateUserRequest;
 import com.taskTracker.taskTracker.service.dtos.requests.user.UpdateUserRequest;
 import com.taskTracker.taskTracker.service.dtos.responses.user.CreatedUserResponse;
@@ -13,9 +14,10 @@ public interface UserService {
     void deleteById(Long id);
     List<GetListUserResponse> findAll();
     List<GetListUserResponse> findByUserName(String userName);
-    List<GetListUserResponse> findByEmail(String email);
+    GetListUserResponse findByEmail(String email);
     List<GetListUserResponse> findById(Long id);
     UpdateUserResponse update(UpdateUserRequest request);
+    DeletedUserResponse softDelete(Long id);
 
 
 }
