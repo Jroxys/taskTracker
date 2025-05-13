@@ -7,6 +7,7 @@ import jakarta.persistence.CascadeType;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "users")
+@SQLRestriction(value = "deleted_at IS NULL")
 public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +43,21 @@ public class User extends BaseEntity{
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
     }
 }

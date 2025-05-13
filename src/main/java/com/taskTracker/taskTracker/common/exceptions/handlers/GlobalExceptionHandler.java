@@ -1,11 +1,10 @@
 package com.taskTracker.taskTracker.common.exceptions.handlers;
 
-import com.taskTracker.taskTracker.common.exceptions.details.BusinessProblemDetails;
-import com.taskTracker.taskTracker.common.exceptions.details.InternalServerProblemDetails;
-import com.taskTracker.taskTracker.common.exceptions.details.NotFoundProblemDetails;
+import com.taskTracker.taskTracker.common.exceptions.details.*;
 import com.taskTracker.taskTracker.common.exceptions.types.BusinessException;
 import com.taskTracker.taskTracker.common.exceptions.types.InternalServerException;
 import com.taskTracker.taskTracker.common.exceptions.types.NotFoundException;
+import com.taskTracker.taskTracker.common.exceptions.types.ValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,11 +23,25 @@ public class GlobalExceptionHandler {
         details.setDetail(businessException.getMessage());
         return details;
     }
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public InvalidTaskStatusProblemDetails handleIllegalArgumentException(IllegalArgumentException illegalArgumentException){
+        InvalidTaskStatusProblemDetails details = new InvalidTaskStatusProblemDetails();
+        details.setDetail(illegalArgumentException.getMessage());
+        return details;
+    }
     @ExceptionHandler({NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public NotFoundProblemDetails handleNotFoundException(NotFoundException notFoundException){
         NotFoundProblemDetails details = new NotFoundProblemDetails();
         details.setDetail(notFoundException.getMessage());
+        return details;
+    }
+    @ExceptionHandler({ValidationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationProblemDetails handleValidationException(ValidationException validationException){
+        ValidationProblemDetails details = new ValidationProblemDetails();
+        details.setDetail(validationException.getMessage());
         return details;
     }
 

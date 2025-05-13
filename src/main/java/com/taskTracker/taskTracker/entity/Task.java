@@ -5,6 +5,7 @@ import com.taskTracker.taskTracker.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "task")
-public class Task extends BaseEntity {
+@SQLRestriction(value = "deleted_at IS NULL")
+public class Task extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
